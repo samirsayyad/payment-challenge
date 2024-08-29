@@ -58,9 +58,9 @@ const PaymentPage: React.FC = () => {
           email: userEmail,
         };
 
-        const response = await payment(paymentData);
+        await payment(paymentData);
         alert("done");
-        navigate("/");
+        navigate("/status");
       } catch (error) {
         console.error("Payment processing error:", error);
       }

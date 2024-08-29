@@ -1,3 +1,6 @@
-.App {
-  color: red;
+.logout {
+  margin: 1rem;
+  padding: 0.5rem;
+  background: red;
+  color: white;
 }

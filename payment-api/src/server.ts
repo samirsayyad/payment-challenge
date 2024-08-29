@@ -4,6 +4,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import loginRoutes from './routes/loginRoute'
 import paymentRoutes from './routes/paymentRoute'
+import statusRoutes from './routes/statusRoute'
 import bodyParser from 'body-parser'
 
 dotenv.config()
@@ -28,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/api', loginRoutes)
 app.use('/api', paymentRoutes)
+app.use('/api', statusRoutes)
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
