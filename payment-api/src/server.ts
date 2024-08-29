@@ -3,6 +3,8 @@ import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import loginRoutes from './routes/loginRoute'
+import paymentRoutes from './routes/paymentRoute'
+import bodyParser from 'body-parser'
 
 dotenv.config()
 
@@ -14,6 +16,7 @@ app.use(express.json())
 if (!process.env.MONGO_URI) {
   throw new Error('MONGO_URI environment variable is not defined')
 }
+
 const mongoUri: string = process.env.MONGO_URI
 
 mongoose
@@ -21,7 +24,10 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Failed to connect to MongoDB', err))
 
+app.use(bodyParser.urlencoded({ extended: true }))
+
 app.use('/api', loginRoutes)
+app.use('/api', paymentRoutes)
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {

@@ -14,12 +14,15 @@
   "description": "",
   "dependencies": {
     "@types/cors": "^2.8.17",
+    "body-parser": "^1.20.2",
+    "braintree": "^3.24.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongoose": "^8.5.4"
   },
   "devDependencies": {
+    "@types/braintree": "^3.3.12",
     "@types/express": "^4.17.21",
     "@types/node": "^22.5.0",
     "prettier": "^3.3.3",

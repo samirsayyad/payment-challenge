@@ -14,7 +14,7 @@ const UserSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
   subscriptionType: { type: String, required: false },
   includeThermometer: { type: Boolean, required: false },
-  subscriptionStatus: { type: String, required: false },
+  subscriptionStatus: { type: String, required: false, default: 'deactive' },
   subscriptionEnd: { type: Date, required: false },
 })
 
