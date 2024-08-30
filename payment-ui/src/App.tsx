@@ -2,7 +2,8 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
-import Payment from "./pages/Payment";
+import SubscriptionSelection from "./pages/SubscriptionSelection";
+import Payment from "./pages/PaymentWrapper";
 import Status from "./pages/Status";
 import { logout } from "./utils/logout";
 
@@ -21,7 +22,8 @@ const App: React.FC = () => {
         </header>
         <main>
           <Routes>
-            <Route path="/" element={!userEmail ? <Login /> : <Payment />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/subscription" element={<SubscriptionSelection />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/status" element={<Status />} />
           </Routes>

@@ -1,56 +1,57 @@
 import React, { useEffect, useState } from "react";
 import { getStatus } from "../integrations/api/StatusApi";
-interface PaymentInfo {
+import { useNavigate } from "react-router-dom";
+
+interface StatusData {
   subscriptionType: "monthly" | "yearly";
-  subscriptionEnd: string;
-  thermometerIncluded: boolean;
+  expirationDate: string;
+  daysRemaining: number;
+  includeThermometer: boolean;
 }
 
 const StatusPage: React.FC = () => {
-  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [statusData, setStatusData] = useState<StatusData | null>(null);
+  const navigate = useNavigate();
 
+  const userEmail = localStorage.getItem("userEmail");
   useEffect(() => {
-    const fetchPaymentInfo = async () => {
+    if (!userEmail) {
+      navigate("/"); // navigate to login
+      return;
+    }
+    const fetchData = async () => {
       try {
-        const userEmail = localStorage.getItem("userEmail");
-
-        if (!userEmail) {
-          setError("User is not logged in.");
-          return;
-        }
-
-        const response = await getStatus(userEmail);
-        setPaymentInfo(response.data);
-      } catch (err) {
-        setError("Failed to fetch payment status.");
+        const data = await getStatus(userEmail);
+        setStatusData(data);
+      } catch (error) {
+        console.error("Failed to fetch status", error);
       }
     };
 
-    fetchPaymentInfo();
+    fetchData();
   }, []);
 
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (!paymentInfo) {
+  if (!statusData) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div>
-      <h1>Status Page</h1>
+    <div className="status-page">
+      <h1>Subscription Status</h1>
       <p>
-        <strong>Subscription Type:</strong> {paymentInfo.subscriptionType}
+        <strong>Subscription Type:</strong>{" "}
+        {statusData.subscriptionType === "monthly" ? "Monthly" : "Yearly"}
       </p>
       <p>
         <strong>Expiration Date:</strong>{" "}
-        {new Date(paymentInfo.subscriptionEnd).toLocaleDateString()}
+        {new Date(statusData.expirationDate).toLocaleDateString()}
       </p>
       <p>
-        <strong>Thermometer Included:</strong>{" "}
-        {paymentInfo.thermometerIncluded ? "Yes" : "No"}
+        <strong>Days Remaining:</strong> {statusData.daysRemaining}
+      </p>
+      <p>
+        <strong>Thermometer Purchased:</strong>{" "}
+        {statusData.includeThermometer ? "Yes" : "No"}
       </p>
     </div>
   );

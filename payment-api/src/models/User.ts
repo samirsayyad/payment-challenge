@@ -2,12 +2,11 @@ import mongoose, { Schema, Document } from 'mongoose'
 
 interface IUser extends Document {
   email: string
-  paymentInfo?: {
-    subscriptionType?: 'Monthly' | 'Yearly'
-    thermometerIncluded?: boolean
-    lastPaymentDate?: Date
-    subscriptionEnd: Date
-  }
+  subscriptionType?: 'Monthly' | 'Yearly'
+  thermometerIncluded?: boolean
+  lastPaymentDate?: Date
+  subscriptionEnd: Date
+  subscriptionStatus: boolean
 }
 
 const UserSchema: Schema = new Schema({

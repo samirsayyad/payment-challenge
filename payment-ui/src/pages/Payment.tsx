@@ -1,113 +1,99 @@
 import React, { useEffect, useState } from "react";
 import { generateToken, payment } from "../integrations/api/PaymentApi";
-import { useNavigate } from "react-router-dom";
 
 declare var braintree: any;
 
-const PaymentPage: React.FC = () => {
-  const userEmail = localStorage.getItem("userEmail");
-  const navigate = useNavigate();
+interface PaymentPageProps {
+  subscriptionType: "monthly" | "yearly";
+  includeThermometer: boolean;
+}
 
+const PaymentPage: React.FC<PaymentPageProps> = ({
+  subscriptionType,
+  includeThermometer,
+}) => {
   const [clientToken, setClientToken] = useState<string | null>(null);
   const [dropinInstance, setDropinInstance] = useState<any>(null);
-  const [subscriptionType, setSubscriptionType] = useState<string>("monthly");
-  const [includeThermometer, setIncludeThermometer] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const getClientToken = async () => {
+    const fetchClientToken = async () => {
       try {
         const response = await generateToken();
         setClientToken(response.clientToken);
       } catch (error) {
-        console.error("Error fetching client token:", error);
+        console.error("Failed to fetch client token", error);
+        setErrorMessage("Failed to load payment gateway. Please try again.");
       }
     };
 
-    getClientToken();
+    fetchClientToken();
   }, []);
 
   useEffect(() => {
     if (clientToken) {
-      const initializeDropin = async () => {
-        try {
-          const instance = await braintree.dropin.create({
-            authorization: clientToken,
-            container: "#dropin-container",
-          });
-          setDropinInstance(instance);
-        } catch (error) {
-          console.error("Error initializing Braintree Drop-in:", error);
-        }
-      };
+      const dropinContainer = document.getElementById("dropin-container");
+      if (dropinContainer) dropinContainer.innerHTML = "";
 
-      initializeDropin();
+      braintree.dropin.create(
+        {
+          authorization: clientToken,
+          container: "#dropin-container",
+        },
+        (error: any, instance: any) => {
+          if (error) {
+            console.error("Error creating Drop-In UI", error);
+            setErrorMessage(
+              "Failed to load payment gateway. Please try again."
+            );
+            return;
+          }
+          setDropinInstance(instance);
+        }
+      );
     }
   }, [clientToken]);
 
-  const handlePayment = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handlePayment = async () => {
+    if (!dropinInstance) return;
 
-    if (dropinInstance) {
-      try {
-        const payload = await dropinInstance.requestPaymentMethod();
-        // Create payment data
-        const paymentData = {
-          paymentMethodNonce: payload.nonce,
-          subscriptionType,
-          includeThermometer,
-          email: userEmail,
-        };
+    try {
+      const payload = await dropinInstance.requestPaymentMethod();
+      const paymentData = {
+        paymentMethodNonce: payload.nonce,
+        subscriptionType,
+        includeThermometer,
+      };
 
-        await payment(paymentData);
-        alert("done");
-        navigate("/status");
-      } catch (error) {
-        console.error("Payment processing error:", error);
+      const response = await payment(paymentData);
+
+      if (response.success) {
+        alert("Payment successful!");
+      } else {
+        setErrorMessage(
+          "Payment failed. Please try again with a different card."
+        );
       }
+    } catch (error) {
+      console.error("Payment error", error);
+      setErrorMessage(
+        "An error occurred during payment. Please check your details and try again."
+      );
     }
   };
 
   return (
-    <div>
-      <h1>Payment Page</h1>
-      <form id="payment-form" onSubmit={handlePayment}>
-        <div>
-          <label>
-            <input
-              type="radio"
-              value="monthly"
-              checked={subscriptionType === "monthly"}
-              onChange={() => setSubscriptionType("monthly")}
-            />
-            Monthly Subscription - 9.90 EUR/month
-          </label>
-        </div>
-        <div>
-          <label>
-            <input
-              type="radio"
-              value="yearly"
-              checked={subscriptionType === "yearly"}
-              onChange={() => setSubscriptionType("yearly")}
-            />
-            Yearly Subscription - 79.90 EUR/year
-          </label>
-        </div>
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              checked={includeThermometer}
-              onChange={() => setIncludeThermometer(!includeThermometer)}
-            />
-            Include Thermometer - 14.90 EUR (one-time)
-          </label>
-        </div>
-        <div id="dropin-container"></div>
-        <button type="submit" disabled={!clientToken}>
-          Pay
-        </button>
-      </form>
+    <div className="payment-page">
+      <h1>Complete Your Payment</h1>
+      <div id="dropin-container"></div>
+      {errorMessage && (
+        <p className="error-message" style={{ color: "red" }}>
+          {errorMessage}
+        </p>
+      )}
+      <button onClick={handlePayment} disabled={!dropinInstance}>
+        Pay Now
+      </button>
     </div>
   );
 };

@@ -21,7 +21,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       message: 'Login successful',
       user: {
         email: user.email,
-        paymentInfo: user.paymentInfo,
+        subscriptionStatus: user.subscriptionStatus,
       },
     })
   } catch (error) {

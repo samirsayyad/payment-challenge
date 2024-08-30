@@ -1,25 +1,36 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../integrations/api/LoginApi";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState("");
+  useAuthRedirect();
+  const [userEmail, setUserEmail] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
+  const handleUserEmailChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setUserEmail(event.target.value);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
-      loginUser(email);
+      const response = await loginUser(userEmail);
+      const { email, subscriptionStatus } = response.user;
+
+      if (!email) {
+        navigate("/");
+        return;
+      }
+
       localStorage.setItem("userEmail", email);
-      navigate("/payment");
+      navigate(subscriptionStatus === "active" ? "/status" : "/subscription");
     } catch (error) {
       setError("Failed to login. Please try again.");
     } finally {
@@ -36,8 +47,8 @@ const Login: React.FC = () => {
             Email:
             <input
               type="email"
-              value={email}
-              onChange={handleEmailChange}
+              value={userEmail}
+              onChange={handleUserEmailChange}
               required
             />
           </label>

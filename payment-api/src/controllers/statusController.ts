@@ -11,16 +11,23 @@ export const getStatus = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({ email: userEmail })
 
-    if (!user || !user.paymentInfo) {
+    if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
     res.json({
-      subscriptionType: user.paymentInfo.subscriptionType,
-      expirationDate: user.paymentInfo.subscriptionEnd,
-      thermometerIncluded: user.paymentInfo.thermometerIncluded,
+      subscriptionType: user.subscriptionType,
+      expirationDate: user.subscriptionEnd,
+      thermometerIncluded: user.thermometerIncluded,
+      daysRemaining: calculateDaysRemaining(user.subscriptionEnd),
     })
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' })
   }
+}
+
+const calculateDaysRemaining = (subscriptionEnd: Date): number => {
+  const now = new Date()
+  const expiry = new Date(subscriptionEnd)
+  return Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 }
