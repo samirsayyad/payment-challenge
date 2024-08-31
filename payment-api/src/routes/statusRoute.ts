@@ -3,6 +3,6 @@ import { getStatus } from '../controllers/statusController'
 
 const router = Router()
 
-router.get('/status', getStatus)
+router.post('/status', getStatus)
 
 export default router

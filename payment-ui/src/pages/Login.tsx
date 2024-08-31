@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../integrations/api/LoginApi";
-import { useAuthRedirect } from "../hooks/useAuthRedirect";
 
 const Login: React.FC = () => {
-  useAuthRedirect();
   const [userEmail, setUserEmail] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

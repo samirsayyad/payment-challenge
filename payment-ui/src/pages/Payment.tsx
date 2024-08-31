@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { generateToken, payment } from "../integrations/api/PaymentApi";
+import { useNavigate } from "react-router-dom";
 
 declare var braintree: any;
 
 interface PaymentPageProps {
   subscriptionType: "monthly" | "yearly";
   includeThermometer: boolean;
+  email: string;
 }
 
 const PaymentPage: React.FC<PaymentPageProps> = ({
   subscriptionType,
   includeThermometer,
+  email,
 }) => {
   const [clientToken, setClientToken] = useState<string | null>(null);
+  const [nonce, setNonce] = useState<string | null>(null);
   const [dropinInstance, setDropinInstance] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [paymentLoading, setPaymentLoading] = useState<boolean | null>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClientToken = async () => {
@@ -31,9 +37,9 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
   }, []);
 
   useEffect(() => {
-    if (clientToken) {
-      const dropinContainer = document.getElementById("dropin-container");
-      if (dropinContainer) dropinContainer.innerHTML = "";
+    const dropinContainer = document.getElementById("dropin-container");
+    if (clientToken && dropinContainer) {
+      dropinContainer.innerHTML = "";
 
       braintree.dropin.create(
         {
@@ -41,13 +47,6 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
           container: "#dropin-container",
         },
         (error: any, instance: any) => {
-          if (error) {
-            console.error("Error creating Drop-In UI", error);
-            setErrorMessage(
-              "Failed to load payment gateway. Please try again."
-            );
-            return;
-          }
           setDropinInstance(instance);
         }
       );
@@ -55,25 +54,30 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
   }, [clientToken]);
 
   const handlePayment = async () => {
+    const paymentData = {
+      paymentMethodNonce: nonce || "",
+      subscriptionType,
+      includeThermometer,
+      email,
+    };
+    setPaymentLoading(true);
+    const response = await payment(paymentData);
+    setPaymentLoading(false);
+    if (response.success) {
+      alert("Payment successful!");
+      navigate("/status");
+    } else {
+      setErrorMessage(
+        "Payment failed. Please try again with a different card."
+      );
+    }
+  };
+  const handlePaymentMethod = async () => {
     if (!dropinInstance) return;
 
     try {
-      const payload = await dropinInstance.requestPaymentMethod();
-      const paymentData = {
-        paymentMethodNonce: payload.nonce,
-        subscriptionType,
-        includeThermometer,
-      };
-
-      const response = await payment(paymentData);
-
-      if (response.success) {
-        alert("Payment successful!");
-      } else {
-        setErrorMessage(
-          "Payment failed. Please try again with a different card."
-        );
-      }
+      const { nonce } = await dropinInstance.requestPaymentMethod();
+      setNonce(nonce);
     } catch (error) {
       console.error("Payment error", error);
       setErrorMessage(
@@ -82,7 +86,9 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
     }
   };
 
-  return (
+  return paymentLoading || !clientToken ? (
+    <div>Loading...</div>
+  ) : (
     <div className="payment-page">
       <h1>Complete Your Payment</h1>
       <div id="dropin-container"></div>
@@ -91,8 +97,18 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
           {errorMessage}
         </p>
       )}
-      <button onClick={handlePayment} disabled={!dropinInstance}>
-        Pay Now
+
+      <button
+        onClick={nonce ? handlePayment : handlePaymentMethod}
+        disabled={!dropinInstance}
+        style={{
+          margin: "auto",
+          padding: "0.5rem 1rem",
+          fontSize: "1rem",
+          display: "block",
+        }}
+      >
+        {nonce ? "Pay" : "Next"}
       </button>
     </div>
   );

@@ -16,14 +16,16 @@ const StatusPage: React.FC = () => {
   const userEmail = localStorage.getItem("userEmail");
   useEffect(() => {
     if (!userEmail) {
-      navigate("/"); // navigate to login
+      navigate("/");
       return;
     }
     const fetchData = async () => {
       try {
         const data = await getStatus(userEmail);
+
         setStatusData(data);
       } catch (error) {
+        navigate("/");
         console.error("Failed to fetch status", error);
       }
     };

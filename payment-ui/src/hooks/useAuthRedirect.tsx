@@ -15,14 +15,12 @@ export const useAuthRedirect = () => {
     const checkUser = async () => {
       try {
         const response = await loginUser(userEmail);
-        const { email, subscriptionStatus } = response.user;
+        const { email } = response.user;
 
         if (!email) {
           navigate("/");
           return;
         }
-
-        navigate(subscriptionStatus === "active" ? "/status" : "/subscription");
       } catch (error) {
         console.error("Session check failed", error);
         navigate("/");

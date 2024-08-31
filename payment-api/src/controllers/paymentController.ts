@@ -19,7 +19,7 @@ const gateway = new braintree.BraintreeGateway({
   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
 })
 
-export const generateClientToken = async (req: Request, res: Response) => {
+export const generateClientToken = async (_: Request, res: Response) => {
   try {
     const response = await gateway.clientToken.generate({})
     res.status(200).json({ clientToken: response.clientToken })
@@ -34,6 +34,12 @@ export const paymentController = async (req: Request, res: Response) => {
     req.body
 
   try {
+    if (!paymentMethodNonce || !subscriptionType || !email) {
+      res
+        .status(400)
+        .json({ success: false, message: 'Missing required fields' })
+      return
+    }
     const transactionResult = await gateway.transaction.sale({
       amount: calculateAmount(subscriptionType, includeThermometer),
       paymentMethodNonce: paymentMethodNonce,

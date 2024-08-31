@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch via ts-node-dev",
+      "runtimeExecutable": "${workspaceFolder}/payment-api/node_modules/.bin/ts-node-dev",
+      "args": ["--respawn", "--transpile-only", "payment-api/src/server.ts"],
+      "cwd": "${workspaceFolder}",
+      "restart": true,
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

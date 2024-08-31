@@ -7,6 +7,7 @@ interface IUser extends Document {
   lastPaymentDate?: Date
   subscriptionEnd: Date
   subscriptionStatus: boolean
+  brainTreeCustomerId?: string
 }
 
 const UserSchema: Schema = new Schema({
