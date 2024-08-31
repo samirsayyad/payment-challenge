@@ -14,6 +14,10 @@ const App: React.FC = () => {
     const email = localStorage.getItem("userEmail");
     setUserEmail(email);
   }, []);
+  const handleLogin = (email: string) => {
+    setUserEmail(email);
+    localStorage.setItem("userEmail", email);
+  };
 
   return (
     <Router>
@@ -28,7 +32,7 @@ const App: React.FC = () => {
         <main>
           <AuthComponent>
             <Routes>
-              <Route path="/" element={<Login />} />
+              <Route path="/" element={<Login onLogin={handleLogin} />} />
               <Route path="/subscription" element={<SubscriptionSelection />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/status" element={<Status />} />

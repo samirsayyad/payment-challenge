@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../integrations/api/LoginApi";
 
-const Login: React.FC = () => {
+type LoginProps = {
+  onLogin: (email: string) => void;
+};
+
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [userEmail, setUserEmail] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +31,7 @@ const Login: React.FC = () => {
         return;
       }
 
-      localStorage.setItem("userEmail", email);
+      onLogin(email);
       navigate(subscriptionStatus === "active" ? "/status" : "/subscription");
     } catch (error) {
       setError("Failed to login. Please try again.");

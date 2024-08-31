@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getStatus } from "../integrations/api/StatusApi";
 import { useNavigate } from "react-router-dom";
+import { getStatus } from "../integrations/api/StatusApi";
 
 interface StatusData {
   subscriptionType: "monthly" | "yearly";
@@ -31,7 +31,7 @@ const StatusPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [navigate, userEmail]);
 
   if (!statusData) {
     return <div>Loading...</div>;
