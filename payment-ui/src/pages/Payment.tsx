@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { generateToken, payment } from "../integrations/api/PaymentApi";
 import { useNavigate } from "react-router-dom";
+import "./styles/Payment.css";
 
 declare var braintree: any;
 
@@ -92,21 +93,11 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
     <div className="payment-page">
       <h1>Complete Your Payment</h1>
       <div id="dropin-container"></div>
-      {errorMessage && (
-        <p className="error-message" style={{ color: "red" }}>
-          {errorMessage}
-        </p>
-      )}
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
 
       <button
         onClick={nonce ? handlePayment : handlePaymentMethod}
         disabled={!dropinInstance}
-        style={{
-          margin: "auto",
-          padding: "0.5rem 1rem",
-          fontSize: "1rem",
-          display: "block",
-        }}
       >
         {nonce ? "Pay" : "Next"}
       </button>

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { User } from '../models/User'
-
+import { User, IUser } from '../models/User'
+import { findCustomerOnBrainTree } from '../integration/brainTree'
 export const getStatus = async (req: Request, res: Response) => {
   const { email } = req.body
 
@@ -9,16 +9,32 @@ export const getStatus = async (req: Request, res: Response) => {
   }
 
   try {
-    const user = await User.findOne({ email })
+    let user: IUser | null = await User.findOne({ email })
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
+    const brainTreeCustomer = await findCustomerOnBrainTree(email)
+    console.log('brainTreeCustomer', brainTreeCustomer)
+    if (!brainTreeCustomer) {
+      return res
+        .status(404)
+        .json({ message: 'User not found in payment gateway' })
+    }
+
+    // @todo: check if user is still valid on braintree
+    const subscription = brainTreeCustomer.paymentMethods.find(
+      (method: any) => method.default,
+    )
+    if (!subscription) {
+      return res.status(404).json({ message: 'Subscription not found' })
+    }
+
     res.json({
       subscriptionType: user.subscriptionType,
       expirationDate: user.subscriptionEnd,
-      thermometerIncluded: user.thermometerIncluded,
+      includeThermometer: user.includeThermometer,
       daysRemaining: calculateDaysRemaining(user.subscriptionEnd),
     })
   } catch (error) {

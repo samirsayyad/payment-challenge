@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose'
 interface IUser extends Document {
   email: string
   subscriptionType?: 'Monthly' | 'Yearly'
-  thermometerIncluded?: boolean
+  includeThermometer?: boolean
   lastPaymentDate?: Date
   subscriptionEnd: Date
   subscriptionStatus: boolean
@@ -16,6 +16,7 @@ const UserSchema: Schema = new Schema({
   includeThermometer: { type: Boolean, required: false },
   subscriptionStatus: { type: String, required: false, default: 'deactive' },
   subscriptionEnd: { type: Date, required: false },
+  brainTreeCustomerId: { type: String, required: true },
 })
 
 const User = mongoose.model<IUser>('User', UserSchema)

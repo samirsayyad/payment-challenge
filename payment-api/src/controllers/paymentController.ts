@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import braintree from 'braintree'
-import { User } from '../models/User'
+import { User, IUser } from '../models/User'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -40,9 +40,25 @@ export const paymentController = async (req: Request, res: Response) => {
         .json({ success: false, message: 'Missing required fields' })
       return
     }
+
+    let user: IUser | null = await User.findOne({ email })
+
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' })
+      return
+    }
+    console.log({
+      amount: calculateAmount(subscriptionType, includeThermometer),
+      paymentMethodNonce: paymentMethodNonce,
+      customerId: user.brainTreeCustomerId,
+      options: {
+        submitForSettlement: true,
+      },
+    })
     const transactionResult = await gateway.transaction.sale({
       amount: calculateAmount(subscriptionType, includeThermometer),
       paymentMethodNonce: paymentMethodNonce,
+      customerId: user.brainTreeCustomerId,
       options: {
         submitForSettlement: true,
       },

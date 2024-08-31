@@ -1,0 +1,28 @@
+.payment-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f2f2f2;
+}
+
+.payment-page h1 {
+  color: #333;
+}
+
+.payment-page .error-message {
+  color: red;
+}
+
+.payment-page button {
+  margin: auto;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  display: block;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getStatus } from "../integrations/api/StatusApi";
+import "./styles/Status.css";
 
 interface StatusData {
   subscriptionType: "monthly" | "yearly";
@@ -25,7 +26,6 @@ const StatusPage: React.FC = () => {
 
         setStatusData(data);
       } catch (error) {
-        navigate("/");
         console.error("Failed to fetch status", error);
       }
     };

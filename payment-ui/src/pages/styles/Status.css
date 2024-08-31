@@ -1,0 +1,22 @@
+.status-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f2f2f2;
+}
+
+.status-page h1 {
+  color: #333;
+}
+
+.status-page p {
+  color: #666;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.status-page p strong {
+  color: #333;
+}
