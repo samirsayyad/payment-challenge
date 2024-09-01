@@ -51,9 +51,19 @@ Follow these steps to set up and run the Payment Challenge locally:
 
 Once the setup is complete, open your browser and navigate to:
 
-```
-http://localhost:3000/
-```
+1. **Locally:** Open your browser and navigate to:
+
+   ```
+   http://localhost:3000/
+   ```
+
+   This will launch the Payment Challenge user interface, where you can start managing payments.
+
+2. **Deployed Version:** Visit the deployed version of the Payment Challenge at:
+
+   ```
+   https://payment-challenge.netlify.app/
+   ```
 
 This will launch the Payment Challenge user interface, where you can start managing payments.
 
