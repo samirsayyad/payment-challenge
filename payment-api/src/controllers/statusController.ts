@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { User, IUser } from '../models/User'
 import { findCustomerOnBrainTree } from '../integration/brainTree'
+import { calculateDaysRemaining } from '../utils/subscription'
 export const getStatus = async (req: Request, res: Response) => {
   const { email } = req.body
 
@@ -22,7 +23,6 @@ export const getStatus = async (req: Request, res: Response) => {
         .json({ message: 'User not found in payment gateway' })
     }
 
-    // @todo: check if user is still valid on braintree
     const subscription = brainTreeCustomer.paymentMethods.find(
       (method: any) => method.default,
     )
@@ -39,10 +39,4 @@ export const getStatus = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' })
   }
-}
-
-const calculateDaysRemaining = (subscriptionEnd: Date): number => {
-  const now = new Date()
-  const expiry = new Date(subscriptionEnd)
-  return Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 }
