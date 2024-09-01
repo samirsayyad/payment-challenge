@@ -22,7 +22,7 @@ export const payment = async (paymentData: PaymentData): Promise<any> => {
     return response.data;
   } catch (error: any) {
     throw new Error(
-      `Failed to process payment: ${error.response?.data?.message || error.message}`
+      `Failed to process payment: ${error.response?.data?.message || error.message}`,
     );
   }
 };

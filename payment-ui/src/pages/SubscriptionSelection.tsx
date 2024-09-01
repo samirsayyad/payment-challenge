@@ -9,7 +9,7 @@ enum SubscriptionType {
 
 const SubscriptionSelection: React.FC = () => {
   const [subscriptionType, setSubscriptionType] = useState<SubscriptionType>(
-    SubscriptionType.Monthly
+    SubscriptionType.Monthly,
   );
   const [includeThermometer, setIncludeThermometer] = useState<boolean>(false);
   const navigate = useNavigate();

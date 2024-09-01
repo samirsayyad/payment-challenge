@@ -17,7 +17,7 @@ const LoginForm: React.FC<{
   const [userEmail, setUserEmail] = useState("");
 
   const handleUserEmailChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setUserEmail(event.target.value);
   };
@@ -64,7 +64,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
         onLogin(email);
         navigate(
-          subscriptionStatus === "active" ? STATUS_ROUTE : SUBSCRIPTION_ROUTE
+          subscriptionStatus === "active" ? STATUS_ROUTE : SUBSCRIPTION_ROUTE,
         );
       } catch (error) {
         setError(`Failed to login: ${error}`);
@@ -72,7 +72,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         setLoading(false);
       }
     },
-    [navigate, onLogin]
+    [navigate, onLogin],
   );
 
   useEffect(() => {

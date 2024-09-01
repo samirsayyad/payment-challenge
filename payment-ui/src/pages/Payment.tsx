@@ -49,7 +49,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
         },
         (error: any, instance: any) => {
           setDropinInstance(instance);
-        }
+        },
       );
     }
   }, [clientToken]);
@@ -69,7 +69,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
       navigate("/status");
     } else {
       setErrorMessage(
-        "Payment failed. Please try again with a different card."
+        "Payment failed. Please try again with a different card.",
       );
     }
   };
@@ -82,7 +82,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
     } catch (error) {
       console.error("Payment error", error);
       setErrorMessage(
-        "An error occurred during payment. Please check your details and try again."
+        "An error occurred during payment. Please check your details and try again.",
       );
     }
   };
