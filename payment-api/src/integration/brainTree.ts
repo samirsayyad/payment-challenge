@@ -17,6 +17,15 @@ const gateway = new braintree.BraintreeGateway({
   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
 })
 
+export const generateToken = async () => {
+  try {
+    const response = await gateway.clientToken.generate({})
+    return response.clientToken
+  } catch (error) {
+    console.error('Error generating Braintree client token:', error)
+    throw error
+  }
+}
 const findCustomerByEmail = async (email: string) => {
   const searchResult = await gateway.customer
     .search((search: any) => {
@@ -51,6 +60,49 @@ export const findCustomerOnBrainTree = async (email: string) => {
     return await findCustomerByEmail(email)
   } catch (error) {
     console.error('Error in findCustomer:', error)
+    throw error
+  }
+}
+
+export const createPaymentMethod = async (
+  customerId: string,
+  paymentMethodNonce: string,
+) => {
+  try {
+    const result = await gateway.paymentMethod.create({
+      customerId,
+      paymentMethodNonce,
+    })
+    if (!result.success) {
+      throw new Error(result.message)
+    }
+    return result
+  } catch (error) {
+    console.error('Error in createPaymentMethod:', error)
+    throw error
+  }
+}
+
+export const saleTransaction = async (
+  customerId: string,
+  paymentMethodToken: string,
+  amount: string,
+) => {
+  try {
+    const result = await gateway.transaction.sale({
+      amount,
+      paymentMethodToken,
+      customerId,
+      options: {
+        submitForSettlement: true,
+      },
+    })
+    if (!result.success) {
+      throw new Error(result.message)
+    }
+    return result
+  } catch (error) {
+    console.error('Error in saleTransaction:', error)
     throw error
   }
 }

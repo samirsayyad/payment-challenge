@@ -1,34 +1,21 @@
 import { Request, Response } from 'express'
 import braintree from 'braintree'
 import { User, IUser } from '../models/User'
-import dotenv from 'dotenv'
-dotenv.config()
-
-if (
-  !process.env.BRAINTREE_MERCHANT_ID ||
-  !process.env.BRAINTREE_PUBLIC_KEY ||
-  !process.env.BRAINTREE_PRIVATE_KEY
-) {
-  throw new Error('BRAINTREE environment variable is not defined')
-}
-
-const gateway = new braintree.BraintreeGateway({
-  environment: braintree.Environment.Sandbox,
-  merchantId: process.env.BRAINTREE_MERCHANT_ID,
-  publicKey: process.env.BRAINTREE_PUBLIC_KEY,
-  privateKey: process.env.BRAINTREE_PRIVATE_KEY,
-})
+import {
+  generateToken,
+  createPaymentMethod,
+  saleTransaction,
+} from '../integration/brainTree'
 
 export const generateClientToken = async (_: Request, res: Response) => {
   try {
-    const response = await gateway.clientToken.generate({})
-    res.status(200).json({ clientToken: response.clientToken })
+    const clientToken = await generateToken()
+    res.status(200).json({ clientToken })
   } catch (error) {
     console.error('Error generating Braintree client token:', error)
     res.status(500).json({ error: 'Failed to generate client token' })
   }
 }
-
 export const paymentController = async (req: Request, res: Response) => {
   const { paymentMethodNonce, subscriptionType, includeThermometer, email } =
     req.body
@@ -49,23 +36,16 @@ export const paymentController = async (req: Request, res: Response) => {
       return
     }
 
-    const paymentMethodResult = await gateway.paymentMethod.create({
-      customerId: user.brainTreeCustomerId,
-      paymentMethodNonce: paymentMethodNonce,
-    })
+    const paymentMethodResult = await createPaymentMethod(
+      user.brainTreeCustomerId,
+      paymentMethodNonce,
+    )
 
-    if (!paymentMethodResult.success) {
-      throw new Error(paymentMethodResult.message)
-    }
-
-    const transactionResult = await gateway.transaction.sale({
-      amount: calculateAmount(subscriptionType, includeThermometer),
-      paymentMethodToken: paymentMethodResult.paymentMethod.token,
-      customerId: user.brainTreeCustomerId,
-      options: {
-        submitForSettlement: true,
-      },
-    })
+    const transactionResult = await saleTransaction(
+      user.brainTreeCustomerId,
+      paymentMethodResult.paymentMethod.token,
+      calculateAmount(subscriptionType, includeThermometer),
+    )
 
     if (transactionResult.success) {
       await User.updateOne(
