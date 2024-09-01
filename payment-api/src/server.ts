@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
@@ -27,6 +27,9 @@ mongoose
 
 app.use(bodyParser.urlencoded({ extended: true }))
 
+app.get('/', (_: Request, res: Response) => {
+  res.status(200).send('OK')
+})
 app.use('/api', loginRoutes)
 app.use('/api', paymentRoutes)
 app.use('/api', statusRoutes)
