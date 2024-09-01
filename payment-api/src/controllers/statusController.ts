@@ -16,7 +16,6 @@ export const getStatus = async (req: Request, res: Response) => {
     }
 
     const brainTreeCustomer = await findCustomerOnBrainTree(email)
-    console.log('brainTreeCustomer', brainTreeCustomer)
     if (!brainTreeCustomer) {
       return res
         .status(404)

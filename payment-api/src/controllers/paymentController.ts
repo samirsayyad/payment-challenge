@@ -40,24 +40,27 @@ export const paymentController = async (req: Request, res: Response) => {
         .json({ success: false, message: 'Missing required fields' })
       return
     }
+    const subscriptionEnd = calculateSubscriptionEnd(subscriptionType)
 
     let user: IUser | null = await User.findOne({ email })
 
-    if (!user) {
+    if (!user || !user.brainTreeCustomerId) {
       res.status(404).json({ success: false, message: 'User not found' })
       return
     }
-    console.log({
-      amount: calculateAmount(subscriptionType, includeThermometer),
-      paymentMethodNonce: paymentMethodNonce,
+
+    const paymentMethodResult = await gateway.paymentMethod.create({
       customerId: user.brainTreeCustomerId,
-      options: {
-        submitForSettlement: true,
-      },
+      paymentMethodNonce: paymentMethodNonce,
     })
+
+    if (!paymentMethodResult.success) {
+      throw new Error(paymentMethodResult.message)
+    }
+
     const transactionResult = await gateway.transaction.sale({
       amount: calculateAmount(subscriptionType, includeThermometer),
-      paymentMethodNonce: paymentMethodNonce,
+      paymentMethodToken: paymentMethodResult.paymentMethod.token,
       customerId: user.brainTreeCustomerId,
       options: {
         submitForSettlement: true,
@@ -65,7 +68,6 @@ export const paymentController = async (req: Request, res: Response) => {
     })
 
     if (transactionResult.success) {
-      const subscriptionEnd = calculateSubscriptionEnd(subscriptionType)
       await User.updateOne(
         { email },
         {
@@ -74,6 +76,7 @@ export const paymentController = async (req: Request, res: Response) => {
           subscriptionStatus: 'active',
           subscriptionEnd,
           transactionId: transactionResult.transaction.id,
+          brainTreeNonce: paymentMethodNonce,
         },
         { upsert: true },
       )

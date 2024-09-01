@@ -34,7 +34,14 @@ const StatusPage: React.FC = () => {
   }, [navigate, userEmail]);
 
   if (!statusData) {
-    return <div>Loading...</div>;
+    return (
+      <div
+        className="status-page"
+        style={{ fontSize: "20px", textAlign: "center" }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   return (

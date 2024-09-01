@@ -88,7 +88,12 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
   };
 
   return paymentLoading || !clientToken ? (
-    <div>Loading...</div>
+    <div
+      className="payment-page"
+      style={{ fontSize: "20px", textAlign: "center" }}
+    >
+      Loading...
+    </div>
   ) : (
     <div className="payment-page">
       <h1>Complete Your Payment</h1>

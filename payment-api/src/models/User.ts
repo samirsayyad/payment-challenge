@@ -8,6 +8,8 @@ interface IUser extends Document {
   subscriptionEnd: Date
   subscriptionStatus: boolean
   brainTreeCustomerId?: string
+  brainTreeNonce?: string
+  transactionId?: string
 }
 
 const UserSchema: Schema = new Schema({
@@ -17,6 +19,8 @@ const UserSchema: Schema = new Schema({
   subscriptionStatus: { type: String, required: false, default: 'deactive' },
   subscriptionEnd: { type: Date, required: false },
   brainTreeCustomerId: { type: String, required: true },
+  brainTreeNonce: { type: String, required: false },
+  transactionId: { type: String, required: false },
 })
 
 const User = mongoose.model<IUser>('User', UserSchema)
