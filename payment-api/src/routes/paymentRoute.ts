@@ -7,6 +7,6 @@ import {
 const router = express.Router()
 
 router.post('/payment', paymentController)
-router.get('/payment/token', generateClientToken)
+router.post('/payment/token', generateClientToken)
 
 export default router

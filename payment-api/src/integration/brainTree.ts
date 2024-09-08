@@ -17,16 +17,22 @@ const gateway = new braintree.BraintreeGateway({
   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
 })
 
-export const generateToken = async () => {
+export const generateToken = async (email: string) => {
   try {
-    const response = await gateway.clientToken.generate({})
+    const customer = await findCustomerOnBrainTree(email)
+    if (!customer) {
+      throw new Error('Customer not found')
+    }
+    const response = await gateway.clientToken.generate({
+      customerId: customer.id,
+    })
     return response.clientToken
   } catch (error) {
     console.error('Error generating Braintree client token:', error)
     throw error
   }
 }
-const findCustomerByEmail = async (email: string) => {
+export const findCustomerOnBrainTree = async (email: string) => {
   const searchResult = await gateway.customer
     .search((search: any) => {
       return search.email().is(email)
@@ -37,7 +43,7 @@ const findCustomerByEmail = async (email: string) => {
 
 export const findOrCreateCustomerOnBrainTree = async (email: string) => {
   try {
-    let customer = await findCustomerByEmail(email)
+    let customer = await findCustomerOnBrainTree(email)
     if (customer) {
       return customer
     }
@@ -51,15 +57,6 @@ export const findOrCreateCustomerOnBrainTree = async (email: string) => {
     return result.customer
   } catch (error) {
     console.error('Error in findOrCreateCustomer:', error)
-    throw error
-  }
-}
-
-export const findCustomerOnBrainTree = async (email: string) => {
-  try {
-    return await findCustomerByEmail(email)
-  } catch (error) {
-    console.error('Error in findCustomer:', error)
     throw error
   }
 }

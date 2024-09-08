@@ -26,7 +26,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
   useEffect(() => {
     const fetchClientToken = async () => {
       try {
-        const response = await generateToken();
+        const response = await generateToken(email);
         setClientToken(response.clientToken);
       } catch (error) {
         console.error("Failed to fetch client token", error);
@@ -35,7 +35,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
     };
 
     fetchClientToken();
-  }, []);
+  }, [email]);
 
   useEffect(() => {
     const dropinContainer = document.getElementById("dropin-container");
@@ -47,9 +47,9 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
           authorization: clientToken,
           container: "#dropin-container",
         },
-        (error: any, instance: any) => {
+        (_error: any, instance: any) => {
           setDropinInstance(instance);
-        },
+        }
       );
     }
   }, [clientToken]);
@@ -69,7 +69,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
       navigate("/status");
     } else {
       setErrorMessage(
-        "Payment failed. Please try again with a different card.",
+        "Payment failed. Please try again with a different card."
       );
     }
   };
@@ -82,7 +82,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
     } catch (error) {
       console.error("Payment error", error);
       setErrorMessage(
-        "An error occurred during payment. Please check your details and try again.",
+        "An error occurred during payment. Please check your details and try again."
       );
     }
   };

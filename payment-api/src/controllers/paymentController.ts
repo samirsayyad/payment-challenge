@@ -10,9 +10,10 @@ import {
   calculateSubscriptionEnd,
 } from '../utils/subscription'
 
-export const generateClientToken = async (_: Request, res: Response) => {
+export const generateClientToken = async (req: Request, res: Response) => {
   try {
-    const clientToken = await generateToken()
+    const { email } = req.body
+    const clientToken = await generateToken(email)
     res.status(200).json({ clientToken })
   } catch (error) {
     console.error('Error generating Braintree client token:', error)
@@ -59,7 +60,6 @@ export const paymentController = async (req: Request, res: Response) => {
           subscriptionStatus: 'active',
           subscriptionEnd,
           transactionId: transactionResult.transaction.id,
-          brainTreeNonce: paymentMethodNonce,
         },
         { upsert: true },
       )
